@@ -48,6 +48,22 @@ Properties:
       Xml: "`3`"
       Custom: "`4`"
 
+  # UrlEncodingMode
+  - name: UrlEncodingMode
+    code: "{UrlEncodingMode}"
+    details:
+      StrictUrlEncoding: "`0`"
+      FormUrlEncoding: "`1`"
+      QueryUrlEncoding: "`2`"
+      CookieUrlEncoding: "`3`"
+      PathUrlEncoding: "`4`"
+    description: |
+      - `StrictUrlEncoding` uses [RFC 3986](https://tools.ietf.org/html/rfc3986) and is the default
+      - `FormUrlEncoding` uses HTML5 form url-encoding and is used with `WebFormat.FormUrlEncoded`
+      - `QueryUrlEncoding` uses subset of `Strict` and `Form` for default querystring encoding
+      - `CookieUrlEncoding` uses [RFC 6265](https://tools.ietf.org/html/rfc6265)
+      - `PathUrlEncoding` uses "pchar" from [RFC 3986](https://tools.ietf.org/html/rfc3986) and is the default
+
   # EnableLogging
   - name: EnableLogging
     code: "Get|Let {Boolean}"
@@ -85,7 +101,7 @@ Methods:
       Message: "`{String}`"
       From: "`{String}` _Optional_"
     description: |
-      Log message (when logging is enabled with `EnableLogging`) 
+      Log message (when logging is enabled with `EnableLogging`)
       with optional location where the message is coming from.
       Useful when writing extensions to VBA-Web (like an `IWebAuthenticator`).
     example: |
@@ -108,7 +124,7 @@ Methods:
     example: |
       WebHelpers.LogWarning "Something could go wrong"
       ' -> WARNING - VBA-Web: Something could go wrong
-      
+
       WebHelpers.LogWarning "Something could go wrong", "Module.Function"
       ' -> WARNING - Module.Function: Something could go wrong
 
@@ -178,9 +194,10 @@ Methods:
 
   # ConvertToJson
   - name: ConvertToJson
-    code: "ConvertToJson(Value) {String}"
+    code: "ConvertToJson(Value, [Whitespace]) {String}"
     details:
       Value: "`{Variant}` `Dictionary`, `Collection`, or `Array` to convert to string"
+      Whitespace: "`{Integer|String}` Pretty-print with given number of spaces or string per indentation"
     description: |
       Convert `Dictionary`, `Collection`, or `Array` to JSON string.
 
@@ -194,9 +211,11 @@ Methods:
 
   # ConvertToUrlEncoded
   - name: ConvertToUrlEncoded
-    code: "ConvertToUrlEncoded(Obj) {String}"
+    code: "ConvertToUrlEncoded(Obj, [EncodingMode = FormUrlEncoding]) {String}"
     details:
       Obj: "`{Dictionary|Collection|Variant}` Value to convert to Url-Encoded string"
+      EncodingMode: |
+        `{UrlEncodingMode}` _Optional_ Default is `UrlEncodingMode.FormUrlEncoding`
     description: |
       Convert `Dictionary`/`Collection` to Url-Encoded string.
 
@@ -207,11 +226,11 @@ Methods:
       Value: "`{String}` Encoded XML value to parse"
     description: |
       Parse XML value to `Dictionary`.
-      
+
       _Note_ Currently, XML is not supported in 4.0.0 due to lack of Mac support.
       An updated parser is being created that supports Mac and Windows,
       but in order to avoid future breaking changes, `ParseXml` and `ConvertToXml` are not currently implemented.
-      
+
       See [XML Support in 4.0](https://github.com/VBA-tools/VBA-Web/wiki/XML-Support-in-4.0) for details on how to use XML in Windows in the meantime.
 
   # ConvertToXml
@@ -221,11 +240,11 @@ Methods:
       Value: "`Dictionary|Variant` XML"
     description: |
       Convert `Dictionary` to XML string.
-      
+
       _Note_ Currently, XML is not supported in 4.0.0 due to lack of Mac support.
       An updated parser is being created that supports Mac and Windows,
       but in order to avoid future breaking changes, `ParseXml` and `ConvertToXml` are not currently implemented.
-      
+
       See [XML Support in 4.0](https://github.com/VBA-tools/VBA-Web/wiki/XML-Support-in-4.0) for details on how to use XML in Windows in the meantime.
 
   # ParseByFormat
@@ -254,29 +273,37 @@ Methods:
 
   # UrlEncode
   - name: UrlEncode
-    code: "UrlEncode(Text, SpaceAsPlus, EncodeUnsafe) {String}"
+    code: "UrlEncode(Text, [SpaceAsPlus = False], [EncodeUnsafe = True], [EncodingMode = StrictUrlEncoding]) {String}"
     details:
       Text: "`{Variant}` Text to encode"
       SpaceAsPlus: |
-        "`{Boolean}` _Optional_ Default is `False`"
+        `{Boolean}` _Optional_ Default is `False`
 
-        `%20` if `False` / `+` if `True`
+        DEPRECATED Use `EncodingMode:=FormUrlEncoding`
       EncodeUnsafe: |
-        "`{Boolean}` _Optional_ Default is `True`"
+        `{Boolean}` _Optional_ Default is `True`
 
-        Encode characters that could be misunderstood within URLs.<br>
-        (``SPACE, ", <, >, #, %, {, }, |, \, ^, ~, `, [, ]``)
+        DEPRECATED This was based on an outdated URI spec and has since been removed.
+          `EncodingMode:=CookieUrlEncoding` is the closest approximation of this behavior
+      EncodingMode: |
+        "`{UrlEncodingMode}` _Optional_ Default is `UrlEncodingMode.StrictUrlEncoding`"
     description: |
       Encode string for URLs ([Reference](http://www.blooberry.com/indexdot/html/topics/urlencoding.htm)).
-  
+
   # UrlDecode
   - name: UrlDecode
-    code: "UrlDecode(Encoded) {String}"
+    code: "UrlDecode(Encoded, [PlusAsSpace = True], [EncodingMode = StrictUrlEncoding]) {String}"
     details:
       Encoded: "`{String}` Text to decode"
+      PlusAsSpace: |
+        `{Boolean}` _Optional_ Default is `True`
+
+        DEPRECATED Use `EncodingMode:=FormUrlEncoded` or `QueryUrlEncoding`
+      EncodingMode: |
+        "`{UrlEncodingMode}` _Optional_ Default is `UrlEncodingMode.StrictUrlEncoding`"
     description: |
       Decode Url-encoded string.
-  
+
   # Base64Encode
   - name: Base64Encode
     code: "Base64Encode(Text) {String}"
@@ -305,7 +332,7 @@ Methods:
       ParseType: "`{String}` _Optional_ `\"String\"` (default) or `\"Binary\"` to pass raw binary response to `ParseCallback`"
     description: |
       Register custom converter for converting request `Body` and response `Content`.
-      If the `ConvertCallback` or `ParseCallback` are object methods, 
+      If the `ConvertCallback` or `ParseCallback` are object methods,
       pass in an object instance.
       If the `ParseCallback` needs the raw binary response value (e.g. file download),
       set `ParseType = "Binary"`, otherwise `"String"` is used.
@@ -453,10 +480,10 @@ Methods:
       KeyValues.Add WebHelpers.CreateKeyValue("a", 123)
       KeyValues.Add WebHelpers.CreateKeyValue("b", 456)
       KeyValues.Add WebHelpers.CreateKeyValue("c", 789)
-      
+
       WebHelpers.AddOrReplaceInKeyValues KeyValues, "b", "abc"
       WebHelpers.AddOrReplaceInKeyValues KeyValues, "d", "def"
-      
+
       ' -> [
       '      {"Key":"a","Value":123},
       '      {"Key":"b","Value":"abc"},
