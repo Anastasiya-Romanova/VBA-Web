@@ -6,7 +6,7 @@ Private pGAClientSecret As String
 ' Implement caching for Client Id, Client Secret, and WebClient
 
 Private Property Get GAClientId() As String
-    If pGAClientId = "" Then
+    If pGAClientId = vbNullString Then
         If Credentials.Loaded Then
             pGAClientId = Credentials.Values("Google")("id")
         Else
@@ -17,7 +17,7 @@ Private Property Get GAClientId() As String
     GAClientId = pGAClientId
 End Property
 Private Property Get GAClientSecret() As String
-    If pGAClientSecret = "" Then
+    If pGAClientSecret = vbNullString Then
         If Credentials.Loaded Then
             pGAClientSecret = Credentials.Values("Google")("secret")
         Else
@@ -46,8 +46,8 @@ End Property
 
 Public Function AnalyticsRequest(ProfileId As String, StartDate As Date, EndDate As Date) As WebRequest
     
-    If ProfileId = "" And Credentials.Loaded Then
-        ProfileId = Credentials.Values("Google")("profile")
+    If ProfileId = vbNullString Then
+        If Credentials.Loaded Then ProfileId = Credentials.Values("Google")("profile")
     End If
     
     Set AnalyticsRequest = New WebRequest
