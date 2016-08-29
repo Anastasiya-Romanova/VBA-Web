@@ -1,7 +1,7 @@
 VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
-END
+End
 Attribute VB_Name = "TodoistAuthenticator"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
@@ -97,12 +97,12 @@ Public Sub Login()
     On Error GoTo auth_ErrorHandling
 
     ' Don't need to login if we already have authorization code or token
-    If Me.AuthorizationCode <> "" Or Me.Token <> "" Then
+    If Me.AuthorizationCode <> vbNullString Or Me.Token <> vbNullString Then
         Exit Sub
     End If
 
     Dim auth_Completed As Boolean
-    If Me.State = "" Then
+    If Me.State = vbNullString Then
         Me.State = WebHelpers.CreateNonce
     End If
 
@@ -115,7 +115,7 @@ Public Sub Login()
         "todoist.com > Settings > Todoist Settings > Account > API token", _
         Title:="Insert Todoist API Token")
 
-    If auth_Response = "" Then
+    If auth_Response = vbNullString Then
         Err.Raise 11040 + vbObjectError, "OAuthDialog", "Login was cancelled"
     End If
 
@@ -183,8 +183,8 @@ End Sub
 ' Logout
 ''
 Public Sub Logout()
-    Me.AuthorizationCode = ""
-    Me.Token = ""
+    Me.AuthorizationCode = vbNullString
+    Me.Token = vbNullString
 End Sub
 
 ''
@@ -213,8 +213,8 @@ End Function
 ' @param in|out {WebRequest} Request The request about to be executed
 ''
 Private Sub IWebAuthenticator_BeforeExecute(ByVal Client As WebClient, ByRef Request As WebRequest)
-    If Me.Token = "" Then
-        If Me.AuthorizationCode = "" Then
+    If Me.Token = vbNullString Then
+        If Me.AuthorizationCode = vbNullString Then
             Me.Login
         End If
 
@@ -326,8 +326,10 @@ End Function
 ' ============================================= '
 
 Private Function auth_LoginIsComplete(auth_IE As Object) As Boolean
-    If Not auth_IE.Busy And auth_IE.ReadyState = 4 Then
-        auth_LoginIsComplete = VBA.InStr(1, auth_IE.LocationURL, Me.RedirectUrl)
+    If Not auth_IE.Busy Then
+        If auth_IE.ReadyState = 4 Then
+            auth_LoginIsComplete = VBA.InStr(1, auth_IE.LocationURL, Me.RedirectUrl)
+        End If
     End If
 End Function
 
