@@ -1,7 +1,7 @@
 VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
-END
+End
 Attribute VB_Name = "GoogleAuthenticator"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
@@ -94,7 +94,7 @@ Public Sub Login()
     On Error GoTo auth_ErrorHandling
     
     ' No need to login if API key, authorization code, or token have been set
-    If Me.ApiKey <> "" Or Me.AuthorizationCode <> "" Or Me.Token <> "" Then
+    If Me.ApiKey <> vbNullString Or Me.AuthorizationCode <> vbNullString Or Me.Token <> vbNullString Then
         Exit Sub
     End If
     
@@ -117,7 +117,7 @@ Public Sub Login()
         "After you've logged in, copy the code from the browser and paste it here to authorize this application", _
         Title:="Logging in...")
     
-    If auth_Response = "" Then
+    If auth_Response = vbNullString Then
         Err.Raise 11040 + vbObjectError, "OAuthDialog", "Login was cancelled"
     End If
     
@@ -160,9 +160,11 @@ auth_Cleanup:
     
 #End If
 
-    If Err.Number = 0 And auth_Completed Then
-        WebHelpers.LogDebug "Login succeeded: " & Me.AuthorizationCode, "GoogleAuthenticator.Login"
-        Exit Sub
+    If Err.Number = 0 Then
+        If auth_Completed Then
+            WebHelpers.LogDebug "Login succeeded: " & Me.AuthorizationCode, "GoogleAuthenticator.Login"
+            Exit Sub
+        End If
     End If
 
 auth_ErrorHandling:
@@ -188,8 +190,8 @@ End Sub
 ' Logout
 ''
 Public Sub Logout()
-    Me.AuthorizationCode = ""
-    Me.Token = ""
+    Me.AuthorizationCode = vbNullString
+    Me.Token = vbNullString
 End Sub
 
 ''
@@ -231,11 +233,11 @@ End Sub
 ' @param in|out {WebRequest} Request The request about to be executed
 ''
 Private Sub IWebAuthenticator_BeforeExecute(ByVal Client As WebClient, ByRef Request As WebRequest)
-    If Me.ApiKey <> "" Then
+    If Me.ApiKey <> vbNullString Then
         Request.AddQuerystringParam "key", Me.ApiKey
     Else
-        If Me.Token = "" Then
-            If Me.AuthorizationCode = "" Then
+        If Me.Token = vbNullString Then
+            If Me.AuthorizationCode = vbNullString Then
                 Me.Login
             End If
             
@@ -375,8 +377,10 @@ End Function
 ' ============================================= '
 
 Private Function auth_LoginIsComplete(auth_IE As Object) As Boolean
-    If Not auth_IE.Busy And auth_IE.ReadyState = 4 Then
-        auth_LoginIsComplete = auth_LoginIsApproval(auth_IE) Or auth_LoginIsError(auth_IE)
+    If Not auth_IE.Busy Then
+        If auth_IE.ReadyState = 4 Then
+            auth_LoginIsComplete = auth_LoginIsApproval(auth_IE) Or auth_LoginIsError(auth_IE)
+        End If
     End If
 End Function
 
@@ -393,9 +397,11 @@ Private Function auth_LoginIsDenied(auth_IE As Object) As Boolean
 
     If auth_LoginIsApproval(auth_IE) Then
         For Each auth_Element In auth_IE.Document.Body.All
-            If VBA.UCase(auth_Element.NodeName) = "P" And auth_Element.Id = "access_denied" Then
-                auth_LoginIsDenied = True
-                Exit Function
+            If VBA.UCase(auth_Element.NodeName) = "P" Then
+                If auth_Element.ID = "access_denied" Then
+                    auth_LoginIsDenied = True
+                    Exit Function
+                End If
             End If
         Next auth_Element
     End If
@@ -423,9 +429,9 @@ Private Function auth_LoginExtractError(auth_IE As Object) As String
     Dim auth_Element As Object
     
     For Each auth_Element In auth_IE.Document.Body.All
-        If auth_Element.Id = "errorCode" Then
+        If auth_Element.ID = "errorCode" Then
             auth_LoginExtractError = auth_Element.innerHTML
-        ElseIf auth_Element.Id = "errorDescription" Then
+        ElseIf auth_Element.ID = "errorDescription" Then
             auth_LoginExtractError = auth_LoginExtractError & ", " & auth_Element.innerHTML
             Exit Function
         End If
