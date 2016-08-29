@@ -1,7 +1,7 @@
 VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
-END
+End
 Attribute VB_Name = "FacebookAuthenticator"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
@@ -155,8 +155,8 @@ End Sub
 ' Logout of Facebook
 ''
 Public Sub Logout()
-    Me.AuthorizationCode = ""
-    Me.Token = ""
+    Me.AuthorizationCode = vbNullString
+    Me.Token = vbNullString
 End Sub
 
 ''
@@ -166,8 +166,8 @@ End Sub
 ' @param in|out {WebRequest} Request The request about to be executed
 ''
 Private Sub IWebAuthenticator_BeforeExecute(ByVal Client As WebClient, ByRef Request As WebRequest)
-    If Me.Token = "" Then
-        If Me.AuthorizationCode = "" Then
+    If Me.Token = vbNullString Then
+        If Me.AuthorizationCode = vbNullString Then
             Me.Login
         End If
         
@@ -369,7 +369,7 @@ Private Function auth_LoginExtractCode(auth_IE As Object) As String
     Set auth_Data = WebHelpers.ParseUrlEncoded(WebHelpers.GetUrlParts(auth_IE.LocationURL)("Hash"))
     auth_LoginExtractCode = auth_Data("code")
     
-    If auth_LoginExtractCode = "" Then
+    If auth_LoginExtractCode = vbNullString Then
         Err.Raise 11042 + vbObjectError, Description:="Authorization code not found in " & auth_IE.LocationURL
     End If
     
@@ -413,4 +413,3 @@ Private Sub Class_Initialize()
     ' Email-only by default
     Me.Scopes = Array("email")
 End Sub
-
