@@ -1,7 +1,7 @@
 VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
-END
+End
 Attribute VB_Name = "OAuth1Authenticator"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
@@ -53,7 +53,7 @@ Public Timestamp As String
 ' @param {String} [Realm]
 ''
 Public Sub Setup(ConsumerKey As String, ConsumerSecret As String, _
-    Token As String, TokenSecret As String, Optional Realm As String = "")
+    Token As String, TokenSecret As String, Optional Realm As String = vbNullString)
     
     Me.ConsumerKey = ConsumerKey
     Me.ConsumerSecret = ConsumerSecret
@@ -122,12 +122,12 @@ Public Function CreateHeader(auth_Client As WebClient, auth_Request As WebReques
     Dim auth_Signature As String
     
     ' Load or create nonce and timestamp
-    If Me.Nonce <> "" Then
+    If Me.Nonce <> vbNullString Then
         auth_Nonce = Me.Nonce
     Else
         auth_Nonce = WebHelpers.CreateNonce()
     End If
-    If Me.Timestamp <> "" Then
+    If Me.Timestamp <> vbNullString Then
         auth_Timestamp = Me.Timestamp
     Else
         auth_Timestamp = auth_CreateTimestamp
@@ -233,8 +233,8 @@ Public Function GetRequestUrl(auth_Client As WebClient, auth_Request As WebReque
     GetRequestUrl = LCase(auth_Parts("Protocol") & "://" & auth_Parts("Host"))
     
     ' Include port (80 and 443 MUST be excluded)
-    If auth_Parts("Port") <> 80 And auth_Parts("Port") <> 443 Then
-        GetRequestUrl = GetRequestUrl & ":" & auth_Parts("Port")
+    If auth_Parts("Port") <> 80 Then
+        If auth_Parts("Port") <> 443 Then GetRequestUrl = GetRequestUrl & ":" & auth_Parts("Port")
     End If
     
     ' Include path
