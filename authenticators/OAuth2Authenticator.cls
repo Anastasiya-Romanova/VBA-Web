@@ -1,7 +1,7 @@
 VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
-END
+End
 Attribute VB_Name = "OAuth2Authenticator"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
@@ -61,7 +61,7 @@ End Sub
 ' @param in|out {WebRequest} Request The request about to be executed
 ''
 Private Sub IWebAuthenticator_BeforeExecute(ByVal Client As WebClient, ByRef Request As WebRequest)
-    If Me.Token = "" Then
+    If Me.Token = vbNullString Then
         Me.Token = Me.GetToken(Client)
     End If
     
@@ -123,7 +123,7 @@ Public Function GetToken(auth_Client As WebClient) As String
     ' Clone client (to avoid accidental interactions)
     Set auth_TokenClient = auth_Client.Clone
     Set auth_TokenClient.Authenticator = Nothing
-    auth_TokenClient.BaseUrl = ""
+    auth_TokenClient.BaseUrl = vbNullString
     
     ' Prepare token request
     auth_Request.Resource = Me.TokenUrl
