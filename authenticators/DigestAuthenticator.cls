@@ -1,7 +1,7 @@
 VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
-END
+End
 Attribute VB_Name = "DigestAuthenticator"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
@@ -42,7 +42,7 @@ Public RequestCount As Long
 Public Opaque As String
 
 Public Property Get ClientNonce() As String
-    If auth_pClientNonce = "" Then
+    If auth_pClientNonce = vbNullString Then
         auth_pClientNonce = WebHelpers.CreateNonce
     End If
     ClientNonce = auth_pClientNonce
@@ -52,7 +52,7 @@ Public Property Let ClientNonce(Value As String)
 End Property
 
 Public Property Get IsAuthenticated() As Boolean
-    If ServerNonce <> "" Then
+    If ServerNonce <> vbNullString Then
         IsAuthenticated = True
     End If
 End Property
@@ -164,7 +164,8 @@ Public Sub ExtractAuthenticateInformation(Response As WebResponse)
     auth_Header = WebHelpers.FindInKeyValues(Response.Headers, "WWW-Authenticate")
     web_CrLf = VBA.Chr$(13) & VBA.Chr$(10)
     
-    If auth_Header <> "" And VBA.Left$(auth_Header, 6) = "Digest" Then
+    If auth_Header <> vbNullString Then
+    If VBA.Left$(auth_Header, 6) = "Digest" Then
         Dim auth_Lines As Variant
         auth_Lines = VBA.Split(VBA.Mid$(auth_Header, 7), web_CrLf)
         
@@ -188,6 +189,7 @@ Public Sub ExtractAuthenticateInformation(Response As WebResponse)
         Next auth_i
         
         WebHelpers.LogDebug "realm=" & Me.Realm & ", nonce=" & Me.ServerNonce & ", opaque=" & Me.Opaque, "DigestAuthenticator.ExtractAuthenticateInformation"
+    End If
     End If
 End Sub
 
