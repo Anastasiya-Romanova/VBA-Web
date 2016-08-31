@@ -4,7 +4,7 @@ Private pGmailClientSecret As String
 Private pGmailClient As WebClient
 
 Private Property Get GmailClientId() As String
-    If pGmailClientId = "" Then
+    If pGmailClientId = vbNullString Then
         If Credentials.Loaded Then
             pGmailClientId = Credentials.Values("Google")("id")
         Else
@@ -15,7 +15,7 @@ Private Property Get GmailClientId() As String
     GmailClientId = pGmailClientId
 End Property
 Private Property Get GmailClientSecret() As String
-    If pGmailClientSecret = "" Then
+    If pGmailClientSecret = vbNullString Then
         If Credentials.Loaded Then
             pGmailClientSecret = Credentials.Values("Google")("secret")
         Else
