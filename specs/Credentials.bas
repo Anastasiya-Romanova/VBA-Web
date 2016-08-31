@@ -7,7 +7,7 @@ Public Property Get CredentialsPath() As String
     Dim i As Long
     Parts = VBA.Split(ThisWorkbook.Path, Application.PathSeparator)
     For i = LBound(Parts) To UBound(Parts) - 1
-        If CredentialsPath = "" Then
+        If CredentialsPath = vbNullString Then
             CredentialsPath = CredentialsPath & Parts(i)
         Else
             CredentialsPath = CredentialsPath & Application.PathSeparator & Parts(i)
@@ -41,29 +41,35 @@ Function Load() As Dictionary
     On Error GoTo ErrorHandling
     Do While Not VBA.EOF(1)
         Line Input #1, Line
-        Line = VBA.Replace(Line, vbNewLine, "")
+        Line = VBA.Replace(Line, vbNewLine, vbNullString)
         
         ' Skip blank lines and comment lines
-        If Line <> "" And VBA.Left$(Line, 1) <> "#" Then
+        If Line <> vbNullString Then
+        If VBA.Left$(Line, 1) <> "#" Then
             If VBA.Left$(Line, 1) = "-" Then
                 Line = VBA.Right$(Line, VBA.Len(Line) - 1)
                 Parts = VBA.Split(Line, ":", 2)
                 
-                If UBound(Parts) >= 1 And Header <> "" And pCredentials.Exists(Header) Then
-                    Key = VBA.Trim(Parts(0))
-                    Value = VBA.Trim(Split(Parts(1), "#")(0))
+                If UBound(Parts) >= 1 Then
+                    If Header <> vbNullString Then
+                        If pCredentials.Exists(Header) Then
+                            Key = VBA.Trim(Parts(0))
+                            Value = VBA.Trim(Split(Parts(1), "#")(0))
                     
-                    If Key <> "" And Value <> "" Then
-                        pCredentials(Header).Add Key, Value
+                            If Key <> vbNullString Then
+                                If Value <> vbNullString Then pCredentials(Header).Add Key, Value
+                            End If
+                        End If
                     End If
                 End If
             Else
                 Header = VBA.Trim(VBA.Split(Line, "#")(0))
                 
-                If Header <> "" Then
+                If Header <> vbNullString Then
                     pCredentials.Add Header, New Dictionary
                 End If
             End If
+        End If
         End If
     Loop
     
