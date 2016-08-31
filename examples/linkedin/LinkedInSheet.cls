@@ -1,7 +1,7 @@
 VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
-END
+End
 Attribute VB_Name = "LinkedInSheet"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
@@ -9,8 +9,8 @@ Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Public Sub LoadProfile()
     Me.[LinkedInFirstName] = "Loading..."
-    Me.[LinkedInLastName] = ""
-    Me.[LinkedInHeadline] = ""
+    Me.[LinkedInLastName] = vbNullString
+    Me.[LinkedInHeadline] = vbNullString
     
     LinkedInSheet.LoadedProfile LinkedIn.GetProfile
 End Sub
