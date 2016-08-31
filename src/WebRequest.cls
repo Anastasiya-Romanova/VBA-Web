@@ -1,7 +1,7 @@
 VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
-END
+End
 Attribute VB_Name = "WebRequest"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
@@ -317,7 +317,7 @@ Public Property Let CustomRequestFormat(Value As String)
         ' Clear cached converted body
         web_pConvertedBody = Empty
 
-        If Value <> "" Then
+        If Value <> vbNullString Then
             web_pRequestFormat = WebFormat.Custom
         End If
     End If
@@ -353,7 +353,7 @@ Public Property Let CustomResponseFormat(Value As String)
         ' Clear cached converted body
         web_pConvertedBody = Empty
 
-        If Value <> "" Then
+        If Value <> vbNullString Then
             ResponseFormat = WebFormat.Custom
         End If
     End If
@@ -376,7 +376,7 @@ End Property
 ' @default Media-type of request format
 ''
 Public Property Get ContentType() As String
-    If web_pContentType <> "" Then
+    If web_pContentType <> vbNullString Then
         ContentType = web_pContentType
     Else
         ContentType = WebHelpers.FormatToMediaType(Me.RequestFormat, Me.CustomRequestFormat)
@@ -403,7 +403,7 @@ End Property
 ' @default Media-type of response format
 ''
 Public Property Get Accept() As String
-    If web_pAccept <> "" Then
+    If web_pAccept <> vbNullString Then
         Accept = web_pAccept
     Else
         Accept = WebHelpers.FormatToMediaType(Me.ResponseFormat, Me.CustomResponseFormat)
@@ -551,7 +551,7 @@ End Property
 ' @type String
 ''
 Public Property Get Id() As String
-    If web_pId = "" Then: web_pId = WebHelpers.CreateNonce
+    If web_pId = vbNullString Then: web_pId = WebHelpers.CreateNonce
     Id = web_pId
 End Property
 
@@ -855,7 +855,7 @@ Private Function web_EncodeCookieName(web_CookieName As Variant) As String
             End Select
         Next web_i
 
-        web_EncodeCookieName = VBA.Join$(web_Result, "")
+        web_EncodeCookieName = VBA.Join$(web_Result, vbNullString)
     End If
 End Function
 
