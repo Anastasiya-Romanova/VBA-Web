@@ -1,7 +1,7 @@
 VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
-END
+End
 Attribute VB_Name = "WebClient"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
@@ -477,7 +477,7 @@ End Function
 ' @param {String} [BypassList=""] Comma-separated list of servers that should bypass proxy
 ''
 Public Sub SetProxy(ProxyServer As String, _
-    Optional Username As String = "", Optional Password As String = "", Optional BypassList As String = "")
+    Optional Username As String = vbNullString, Optional Password As String = vbNullString, Optional BypassList As String = vbNullString)
 
     Me.ProxyServer = ProxyServer
     Me.ProxyUsername = Username
@@ -529,11 +529,11 @@ Public Function PrepareHttpRequest(Request As WebRequest, Optional Async As Bool
 
     ' Setup proxy
     ' See http://msdn.microsoft.com/en-us/library/windows/desktop/aa384059(v=vs.85).aspx for details
-    If Me.ProxyServer <> "" Then
+    If Me.ProxyServer <> vbNullString Then
         WebHelpers.LogDebug "SetProxy: " & Me.ProxyServer, "WebClient.PrepareHttpRequest"
         web_Http.SetProxy web_HttpRequest_ProxySetting_Proxy, Me.ProxyServer, Me.ProxyBypassList
 
-        If Me.ProxyUsername <> "" Then
+        If Me.ProxyUsername <> vbNullString Then
             WebHelpers.LogDebug "SetProxyCredentials: " & Me.ProxyUsername & ", " & WebHelpers.Obfuscate(Me.ProxyPassword), "WebClient.PrepareHttpRequest"
             web_Http.SetCredentials Me.ProxyUsername, Me.ProxyPassword, web_HttpRequest_SetCredentials_ForProxy
         End If
@@ -622,13 +622,13 @@ Public Function PrepareCurlRequest(Request As WebRequest) As String
     web_Curl = web_Curl & " --max-time " & 3 * Me.TimeoutMs / 1000
 
     ' Setup proxy
-    If Me.ProxyServer <> "" Then
+    If Me.ProxyServer <> vbNullString Then
         web_Curl = web_Curl & " --proxy " & Me.ProxyServer
 
-        If Me.ProxyBypassList <> "" Then
+        If Me.ProxyBypassList <> vbNullString Then
             web_Curl = web_Curl & " --noproxy " & Me.ProxyBypassList
         End If
-        If Me.ProxyUsername <> "" Then
+        If Me.ProxyUsername <> vbNullString Then
             web_Curl = web_Curl & " --proxy-user " & Me.ProxyUsername & ":" & Me.ProxyPassword
         End If
     End If
@@ -651,7 +651,7 @@ Public Function PrepareCurlRequest(Request As WebRequest) As String
     For Each web_KeyValue In Request.Cookies
         web_CookieString = web_CookieString & web_KeyValue("Key") & "=" & web_KeyValue("Value") & ";"
     Next web_KeyValue
-    If web_CookieString <> "" Then
+    If web_CookieString <> vbNullString Then
         web_Curl = web_Curl & " --cookie '" & web_CookieString & "'"
     End If
 
