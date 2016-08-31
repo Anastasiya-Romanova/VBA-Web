@@ -6,7 +6,7 @@ Private pTwitterSecret As String
 ' Implement caching for Consumer Key, Consumer Secret, and WebClient
 
 Private Property Get TwitterKey() As String
-    If pTwitterKey = "" Then
+    If pTwitterKey = vbNullString Then
         If Credentials.Loaded Then
             pTwitterKey = Credentials.Values("Twitter")("key")
         Else
@@ -17,7 +17,7 @@ Private Property Get TwitterKey() As String
     TwitterKey = pTwitterKey
 End Property
 Private Property Get TwitterSecret() As String
-    If pTwitterSecret = "" Then
+    If pTwitterSecret = vbNullString Then
         If Credentials.Loaded Then
             pTwitterSecret = Credentials.Values("Twitter")("secret")
         Else
@@ -65,4 +65,3 @@ End Function
 'Public Sub SearchTwitterAsync(query As String, Callback As String)
 '    TwitterClient.ExecuteAsync SearchTweetsRequest(query), Callback
 'End Sub
-    
