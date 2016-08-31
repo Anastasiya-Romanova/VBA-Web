@@ -52,7 +52,7 @@ Option Explicit
 
 ' === AutoProxy Headers
 #If Mac Then
-#ElseIf VBA7 Then
+#ElseIf Win64 Or VBA7 Then
 
 Private Declare PtrSafe Sub AutoProxy_CopyMemory Lib "kernel32" Alias "RtlMoveMemory" _
     (ByVal AutoProxy_lpDest As LongPtr, ByVal AutoProxy_lpSource As LongPtr, ByVal AutoProxy_cbCopy As Long)
@@ -149,7 +149,7 @@ Private Declare Function utc_pclose Lib "libc.dylib" Alias "pclose" (ByVal utc_F
 Private Declare Function utc_fread Lib "libc.dylib" Alias "fread" (ByVal utc_Buffer As String, ByVal utc_Size As Long, ByVal utc_Number As Long, ByVal utc_File As Long) As Long
 Private Declare Function utc_feof Lib "libc.dylib" Alias "feof" (ByVal utc_File As Long) As Long
 
-#ElseIf VBA7 Then
+#ElseIf Win64 Or VBA7 Then
 
 ' http://msdn.microsoft.com/en-us/library/windows/desktop/ms724421.aspx
 ' http://msdn.microsoft.com/en-us/library/windows/desktop/ms724949.aspx
@@ -206,7 +206,7 @@ End Type
 ' === End VBA-UTC
 
 #If Mac Then
-#ElseIf VBA7 Then
+#ElseIf Win64 Or VBA7 Then
 
 Private Declare PtrSafe Sub json_CopyMemory Lib "kernel32" Alias "RtlMoveMemory" _
     (json_MemoryDestination As Any, json_MemorySource As Any, ByVal json_ByteLength As Long)
@@ -337,7 +337,7 @@ Public Enum WebFormat
     PlainText = 0
     Json = 1
     FormUrlEncoded = 2
-    Xml = 3
+    XML = 3
     Custom = 9
 End Enum
 
@@ -710,13 +710,13 @@ End Function
 ' @throws 11000 - Error during parsing
 ''
 Public Function ParseByFormat(Value As String, Format As WebFormat, _
-    Optional CustomFormat As String = "", Optional Bytes As Variant) As Object
+    Optional CustomFormat As String = vbNullString, Optional Bytes As Variant) As Object
 
     On Error GoTo web_ErrorHandling
 
     ' Don't attempt to parse blank values
-    If Value = "" And CustomFormat = "" Then
-        Exit Function
+    If Value = vbNullString Then
+        If CustomFormat = vbNullString Then Exit Function
     End If
 
     Select Case Format
@@ -724,7 +724,7 @@ Public Function ParseByFormat(Value As String, Format As WebFormat, _
         Set ParseByFormat = ParseJson(Value)
     Case WebFormat.FormUrlEncoded
         Set ParseByFormat = ParseUrlEncoded(Value)
-    Case WebFormat.Xml
+    Case WebFormat.XML
         Set ParseByFormat = ParseXml(Value)
     Case WebFormat.Custom
 #If EnableCustomFormatting Then
@@ -739,9 +739,9 @@ Public Function ParseByFormat(Value As String, Format As WebFormat, _
             Set web_Instance = web_Converter("Instance")
 
             If web_Converter("ParseType") = "Binary" Then
-                Set ParseByFormat = VBA.CallByName(web_Instance, web_Callback, VBA.vbMethod, Bytes)
+                Set ParseByFormat = VBA.CallByName(web_Instance, web_Callback, VBA.VbMethod, Bytes)
             Else
-                Set ParseByFormat = VBA.CallByName(web_Instance, web_Callback, VBA.vbMethod, Value)
+                Set ParseByFormat = VBA.CallByName(web_Instance, web_Callback, VBA.VbMethod, Value)
             End If
         Else
             If web_Converter("ParseType") = "Binary" Then
@@ -786,7 +786,7 @@ Public Function ConvertToFormat(Obj As Variant, Format As WebFormat, Optional Cu
         ConvertToFormat = ConvertToJson(Obj)
     Case WebFormat.FormUrlEncoded
         ConvertToFormat = ConvertToUrlEncoded(Obj)
-    Case WebFormat.Xml
+    Case WebFormat.XML
         ConvertToFormat = ConvertToXml(Obj)
     Case WebFormat.Custom
 #If EnableCustomFormatting Then
@@ -799,7 +799,7 @@ Public Function ConvertToFormat(Obj As Variant, Format As WebFormat, Optional Cu
         If web_Converter.Exists("Instance") Then
             Dim web_Instance As Object
             Set web_Instance = web_Converter("Instance")
-            ConvertToFormat = VBA.CallByName(web_Instance, web_Callback, VBA.vbMethod, Obj)
+            ConvertToFormat = VBA.CallByName(web_Instance, web_Callback, VBA.VbMethod, Obj)
         Else
             ConvertToFormat = Application.Run(web_Callback, Obj)
         End If
@@ -1206,8 +1206,8 @@ Public Function JoinUrl(LeftSide As String, RightSide As String) As String
         LeftSide = Left(LeftSide, Len(LeftSide) - 1)
     End If
 
-    If LeftSide <> "" And RightSide <> "" Then
-        JoinUrl = LeftSide & "/" & RightSide
+    If LeftSide <> vbNullString Then
+    If RightSide <> vbNullString Then JoinUrl = LeftSide & "/" & RightSide
     Else
         JoinUrl = LeftSide & RightSide
     End If
@@ -1294,7 +1294,7 @@ Public Function GetUrlParts(Url As String) As Dictionary
                 web_Parts.Add "Querystring", Mid$(web_Value, QueryIndex + 1)
             Else
                 web_Parts.Add "Path", web_Value
-                web_Parts.Add "Querystring", ""
+                web_Parts.Add "Querystring", vbNullString
             End If
         Else
             web_Parts.Add web_Key, web_Value
@@ -1302,7 +1302,7 @@ Public Function GetUrlParts(Url As String) As Dictionary
     Next web_ResultPart
 
     If web_AddedProtocol And web_Parts.Exists("Protocol") Then
-        web_Parts("Protocol") = ""
+        web_Parts("Protocol") = vbNullString
     End If
 #Else
     ' Create document/element is expensive, cache after creation
@@ -1312,11 +1312,11 @@ Public Function GetUrlParts(Url As String) As Dictionary
     End If
 
     web_pElHelper.href = Url
-    web_Parts.Add "Protocol", Replace(web_pElHelper.Protocol, ":", "", Count:=1)
+    web_Parts.Add "Protocol", Replace(web_pElHelper.Protocol, ":", vbNullString, Count:=1)
     web_Parts.Add "Host", web_pElHelper.hostname
     web_Parts.Add "Port", web_pElHelper.port
     web_Parts.Add "Path", web_pElHelper.pathname
-    web_Parts.Add "Querystring", Replace(web_pElHelper.Search, "?", "", Count:=1)
+    web_Parts.Add "Querystring", Replace(web_pElHelper.Search, "?", vbNullString, Count:=1)
     web_Parts.Add "Hash", Replace(web_pElHelper.Hash, "#", "", Count:=1)
 #End If
 
@@ -1326,9 +1326,9 @@ Public Function GetUrlParts(Url As String) As Dictionary
         PathParts = Split(web_Parts("Path"), "/")
 
         web_Parts("Port") = PathParts(0)
-        web_Parts("Protocol") = ""
+        web_Parts("Protocol") = vbNullString
         web_Parts("Host") = "localhost"
-        web_Parts("Path") = Replace(web_Parts("Path"), web_Parts("Port"), "", Count:=1)
+        web_Parts("Path") = Replace(web_Parts("Path"), web_Parts("Port"), vbNullString, Count:=1)
     End If
     If Left(web_Parts("Path"), 1) <> "/" Then
         web_Parts("Path") = "/" & web_Parts("Path")
@@ -1518,7 +1518,7 @@ Public Function FormatToMediaType(Format As WebFormat, Optional CustomFormat As 
         FormatToMediaType = "application/x-www-form-urlencoded;charset=UTF-8"
     Case WebFormat.Json
         FormatToMediaType = "application/json"
-    Case WebFormat.Xml
+    Case WebFormat.XML
         FormatToMediaType = "application/xml"
     Case WebFormat.Custom
         FormatToMediaType = web_GetConverter(CustomFormat)("MediaType")
@@ -2092,7 +2092,7 @@ Public Function ConvertToJson(ByVal JsonValue As Variant, Optional ByVal Whitesp
                         json_Converted = ConvertToJson(JsonValue(json_Index, json_Index2D), Whitespace, json_CurrentIndentation + 2)
 
                         ' For Arrays/Collections, undefined (Empty/Nothing) is treated as null
-                        If json_Converted = "" Then
+                        If json_Converted = vbNullString Then
                             ' (nest to only check if converted = "")
                             If json_IsUndefined(JsonValue(json_Index, json_Index2D)) Then
                                 json_Converted = "null"
@@ -2117,7 +2117,7 @@ Public Function ConvertToJson(ByVal JsonValue As Variant, Optional ByVal Whitesp
                     json_Converted = ConvertToJson(JsonValue(json_Index), Whitespace, json_CurrentIndentation + 1)
 
                     ' For Arrays/Collections, undefined (Empty/Nothing) is treated as null
-                    If json_Converted = "" Then
+                    If json_Converted = vbNullString Then
                         ' (nest to only check if converted = "")
                         If json_IsUndefined(JsonValue(json_Index)) Then
                             json_Converted = "null"
@@ -2165,7 +2165,7 @@ Public Function ConvertToJson(ByVal JsonValue As Variant, Optional ByVal Whitesp
             For Each json_Key In JsonValue.Keys
                 ' For Objects, undefined (Empty/Nothing) is not added to object
                 json_Converted = ConvertToJson(JsonValue(json_Key), Whitespace, json_CurrentIndentation + 1)
-                If json_Converted = "" Then
+                If json_Converted = vbNullString Then
                     json_SkipItem = json_IsUndefined(JsonValue(json_Key))
                 Else
                     json_SkipItem = False
@@ -2213,7 +2213,7 @@ Public Function ConvertToJson(ByVal JsonValue As Variant, Optional ByVal Whitesp
                 json_Converted = ConvertToJson(json_Value, Whitespace, json_CurrentIndentation + 1)
 
                 ' For Arrays/Collections, undefined (Empty/Nothing) is treated as null
-                If json_Converted = "" Then
+                If json_Converted = vbNullString Then
                     ' (nest to only check if converted = "")
                     If json_IsUndefined(json_Value) Then
                         json_Converted = "null"
@@ -3001,11 +3001,11 @@ Public Sub GetAutoProxy(ByVal Url As String, ByRef ProxyServer As String, ByRef 
     Dim AutoProxy_ErrorMsg As String
 
     AutoProxy_AutoProxyOptions.AutoProxy_fAutoLogonIfChallenged = 1
-    ProxyServer = ""
-    ProxyBypass = ""
+    ProxyServer = vbNullString
+    ProxyBypass = vbNullString
 
     ' WinHttpGetProxyForUrl returns unexpected errors if Url is empty
-    If Url = "" Then Url = " "
+    If Url = vbNullString Then Url = " "
 
     On Error GoTo AutoProxy_Cleanup
 
