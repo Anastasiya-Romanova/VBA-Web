@@ -62,9 +62,9 @@ Public Function Specs() As SpecSuite
                             "nonce=""dcd98b7102dd2f0e8b11d0f600bfb0c093""," & web_CrLf & _
                             "Opaque = ""5ccc069c403ebaf9f0171e9517f40e41""")
     
-        Auth.Realm = ""
-        Auth.ServerNonce = ""
-        Auth.Opaque = ""
+        Auth.Realm = vbNullString
+        Auth.ServerNonce = vbNullString
+        Auth.Opaque = vbNullString
         
         Auth.ExtractAuthenticateInformation Unauthorized
         .Expect(Auth.Realm).ToEqual "testrealm@host.com"
@@ -74,5 +74,3 @@ Public Function Specs() As SpecSuite
     
     InlineRunner.RunSuite Specs
 End Function
-
-
