@@ -1,7 +1,7 @@
 VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
-END
+End
 Attribute VB_Name = "MapsSheet"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
@@ -10,7 +10,7 @@ Attribute VB_Exposed = True
 Public Sub FindDrivingDistance()
     ' Loading
     Me.[Distance] = "Loading"
-    Me.[Message] = ""
+    Me.[Message] = vbNullString
 
     ' Get directions for given origin and destination and process async
     OutputDrivingDistance Maps.MapsClient.Execute(Maps.DirectionsRequest(Me.[Origin], Me.[Destination]))
