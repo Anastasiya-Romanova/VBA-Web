@@ -28,14 +28,14 @@ Public Function Specs() As SpecSuite
 
     With Specs.It("should login")
         Auth.Login
-        .Expect(Auth.AuthorizationCode).ToNotEqual ""
+        .Expect(Auth.AuthorizationCode).ToNotEqual vbNullString
     End With
 
     With Specs.It("should skip login if API key is used")
         Auth.Logout
         Auth.ApiKey = "abc"
         Auth.Login
-        .Expect(Auth.AuthorizationCode).ToEqual ""
+        .Expect(Auth.AuthorizationCode).ToEqual vbNullString
     End With
     
     With Specs.It("should add scopes to login url")
