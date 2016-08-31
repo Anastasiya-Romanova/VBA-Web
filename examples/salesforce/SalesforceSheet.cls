@@ -1,7 +1,7 @@
 VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
-END
+End
 Attribute VB_Name = "SalesforceSheet"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
@@ -12,14 +12,14 @@ Private pPassword As String
 Private pSecurityToken As String
 
 Public Property Get ConsumerKeyValue() As String
-    If Me.[ConsumerKey].Value = "" And Credentials.Loaded Then
-        ConsumerKeyValue = Credentials.Values("Salesforce")("key")
+    If Me.[ConsumerKey].Value = vbNullString Then
+        If Credentials.Loaded Then ConsumerKeyValue = Credentials.Values("Salesforce")("key")
     Else
         ConsumerKeyValue = Me.[ConsumerKey].Value
     End If
 End Property
 Public Property Get ConsumerSecret() As String
-    If pConsumerSecret = "" Then
+    If pConsumerSecret = vbNullString Then
         If Credentials.Loaded Then
             pConsumerSecret = Credentials.Values("Salesforce")("secret")
         Else
@@ -29,20 +29,20 @@ Public Property Get ConsumerSecret() As String
     ConsumerSecret = pConsumerSecret
 End Property
 Public Property Get UsernameValue() As String
-    If Me.[Username].Value = "" And Credentials.Loaded Then
-        UsernameValue = Credentials.Values("Salesforce")("username")
+    If Me.[UserName].Value = vbNullString Then
+        If Credentials.Loaded Then UsernameValue = Credentials.Values("Salesforce")("username")
     Else
-        UsernameValue = Me.[Username].Value
+        UsernameValue = Me.[UserName].Value
     End If
 End Property
 Public Property Get Password() As String
-    If pPassword = "" Then
+    If pPassword = vbNullString Then
         pPassword = InputBox("Please enter Salesforce password")
     End If
     Password = pPassword
 End Property
 Public Property Get SecurityToken() As String
-    If pSecurityToken = "" Then
+    If pSecurityToken = vbNullString Then
         If Credentials.Loaded Then
             pSecurityToken = Credentials.Values("Salesforce")("token")
         Else
@@ -82,7 +82,7 @@ Public Sub ProcessObject(Results As WebResponse)
 End Sub
 
 Private Sub ClearOutput()
-    Me.[GetObjectResultName] = ""
+    Me.[GetObjectResultName] = vbNullString
 End Sub
 
 Private Sub OutputObject(Results As Dictionary)
@@ -96,7 +96,7 @@ End Sub
 Private Sub Login()
     Salesforce.ConsumerKey = ConsumerKeyValue
     Salesforce.ConsumerSecret = ConsumerSecret
-    Salesforce.Username = UsernameValue
+    Salesforce.UserName = UsernameValue
     Salesforce.Password = Password
     Salesforce.SecurityToken = SecurityToken
 End Sub
