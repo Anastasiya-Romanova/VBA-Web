@@ -10,8 +10,17 @@ Attribute VB_Name = "Specs_WebAsyncWrapper"
 '
 ' ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ '
 
-Private Declare Sub Sleep Lib "kernel32" (ByVal Milliseconds As Long)
-Private Declare Function GetTickCount Lib "kernel32" () As Long
+#If VBA7 Then
+    #If Win64 Then
+            Private Declare PtrSafe Sub Sleep Lib "kernel32" (ByVal Milliseconds As Long)
+            Private Declare PtrSafe Function GetTickCount Lib "kernel32" () As Long
+    #End If
+#Else
+    Private Declare Sub Sleep Lib "kernel32" (ByVal Milliseconds As Long)
+    Private Declare Function GetTickCount Lib "kernel32" () As Long
+#End If
+
+
 Dim AsyncResponse As WebResponse
 Dim AsyncArgs As Variant
 
@@ -152,4 +161,3 @@ Private Function Ceiling(Value As Double) As Long
         Ceiling = Ceiling + 1
     End If
 End Function
-
