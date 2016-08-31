@@ -6,7 +6,7 @@ Private pLinkedInUserToken As String
 Private pLinkedInUserSecret As String
 
 Private Property Get LinkedInAPIKey() As String
-    If pLinkedInAPIKey = "" Then
+    If pLinkedInAPIKey = vbNullString Then
         If Credentials.Loaded Then
             pLinkedInAPIKey = Credentials.Values("LinkedIn")("api_key")
         Else
@@ -18,7 +18,7 @@ Private Property Get LinkedInAPIKey() As String
 End Property
 
 Private Property Get LinkedInAPISecret() As String
-    If pLinkedInAPISecret = "" Then
+    If pLinkedInAPISecret = vbNullString Then
         If Credentials.Loaded Then
             pLinkedInAPISecret = Credentials.Values("LinkedIn")("api_secret")
         Else
@@ -30,7 +30,7 @@ Private Property Get LinkedInAPISecret() As String
 End Property
 
 Private Property Get LinkedInUserToken() As String
-    If pLinkedInUserToken = "" Then
+    If pLinkedInUserToken = vbNullString Then
         If Credentials.Loaded Then
             pLinkedInUserToken = Credentials.Values("LinkedIn")("user_token")
         Else
@@ -42,7 +42,7 @@ Private Property Get LinkedInUserToken() As String
 End Property
 
 Private Property Get LinkedInUserSecret() As String
-    If pLinkedInUserSecret = "" Then
+    If pLinkedInUserSecret = vbNullString Then
         If Credentials.Loaded Then
             pLinkedInUserSecret = Credentials.Values("LinkedIn")("user_secret")
         Else
@@ -70,11 +70,11 @@ Private Property Get LinkedInClient() As WebClient
     Set LinkedInClient = pLinkedInClient
 End Property
 
-Public Function GetProfile(Optional Callback As String = "") As WebResponse
+Public Function GetProfile(Optional Callback As String = vbNullString) As WebResponse
     Dim Request As New WebRequest
     Request.Resource = "people/~?format=json"
     
-'    If Callback <> "" Then
+'    If Callback <> vbNullString Then
 '        LinkedInClient.ExecuteAsync Request, Callback
 '    Else
         Set GetProfile = LinkedInClient.Execute(Request)
